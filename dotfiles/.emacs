@@ -261,3 +261,23 @@
            (my/control-define-readonly alias)))))))
 
 (my/controls-register)
+
+(add-to-list 'load-path "~/.emacs.d/lisp")
+(require 'dwarf-mode)
+
+(defun dump (&optional args)
+  "Disassemble the current buffer's object file with objdump into a new `asm-mode' buffer.
+With prefix arg, prompt for objdump flags (default \"-d -C\")."
+  (interactive (list (when current-prefix-arg
+                       (read-string "objdump flags: " "-d -C -M intel"))))
+  (let* ((file (or buffer-file-name (read-file-name "Object file: ")))
+         (out (get-buffer-create (format "*dump %s*" (file-name-nondirectory file)))))
+    (with-current-buffer out
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (apply #'call-process dwarf-objdump-program nil t nil
+               (append (split-string (or args "-d -C")) (list (expand-file-name file))))
+        (goto-char (point-min)))
+      (asm-mode)
+      (setq buffer-read-only t))
+    (pop-to-buffer out)))

@@ -91,18 +91,18 @@
         save = mkSystem {
           currentHz = env.hzMin;
           extraModules = [ ./profiles/power-save.nix ]
-            ++ nixpkgs.lib.optional env.hasNvidia ./profiles/no-nvidia.nix;
+            ++ nixpkgs.lib.optional (!env.useNvidia) ./profiles/no-nvidia.nix;
         };
         min = mkSystem {
           currentHz = env.hzMin;
           extraModules = connectedModules
-            ++ nixpkgs.lib.optional env.hasNvidia ./profiles/no-nvidia.nix;
+            ++ nixpkgs.lib.optional (!env.useNvidia) ./profiles/no-nvidia.nix;
         };
         max = mkSystem {
           currentHz = env.hzMax;
           extraModules = connectedModules
                          ++ [ ./profiles/max.nix ./profiles/opacity.nix ./profiles/blur.nix ]
-                         ++ nixpkgs.lib.optional env.hasNvidia ./profiles/no-nvidia.nix;
+                         ++ nixpkgs.lib.optional (!env.useNvidia) ./profiles/no-nvidia.nix;
         };
       };
     };

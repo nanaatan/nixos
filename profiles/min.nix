@@ -108,6 +108,7 @@ in {
     my-boomer
     boomer-live
     firefox
+    vesktop
     zoom-us
     discord
     openssl
@@ -118,6 +119,7 @@ in {
     claude-code
     claude-agent-acp
     opencode
+    antigravity-cli
     sops age
     xinit xrandr xset xinput xkbcomp xwallpaper
     (python3.withPackages (ps: [ ps.xlib ]))
@@ -127,6 +129,7 @@ in {
     terminus_font dejavu_fonts liberation_ttf noto-fonts-cjk-sans
     vscode
     krita
+    glab
   ];
 
   environment.variables = {

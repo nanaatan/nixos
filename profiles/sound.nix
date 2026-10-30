@@ -28,6 +28,13 @@ in
     wireplumber.enable = true;
   };
 
-  environment.systemPackages = [ volumeControls ];
+  systemd.user.services.pipewire.wantedBy = [ "default.target" ];
+  systemd.user.services.pipewire-pulse.wantedBy = [ "default.target" ];
+  systemd.user.services.wireplumber.wantedBy = [ "default.target" ];
+
+  environment.systemPackages = [
+    volumeControls
+    pkgs.easyeffects
+  ];
 
 }

@@ -59,3 +59,9 @@ ls -l /run/secrets/
 sudo -u agent -i
 ```
 Give it its own checkout (e.g. `/home/agent/nixos`) and its own limited API keys. Don't let it connect to your X display.
+
+
+## Usage example for gitlab auth using PAT
+```sh
+sops -d --extract '["gitlab_token"]' sops.yaml | glab auth login --hostname gitlab-edu.itb.ac.id --stdin
+```

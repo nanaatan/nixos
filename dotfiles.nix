@@ -34,6 +34,7 @@
       graphviz-dot-mode
       csv-mode
       pdf-tools
+      yara-mode
     ];
   };
 
@@ -94,6 +95,7 @@
         (setq catppuccin-flavor 'mocha)
         (load-theme 'catppuccin t)))
   '';
+  home.file.".emacs.d/lisp/dwarf-mode.el".source = ./dotfiles/dwarf-mode.el;
   home.file.".config/picom.conf".text = builtins.readFile ./dotfiles/picom.conf;
   home.file.".profile".text = builtins.readFile ./dotfiles/.profile;
   home.file.".tmux.conf".text = builtins.readFile ./dotfiles/.tmux.conf;

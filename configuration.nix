@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   env = import ./env.nix;
+  containerRuntime = env.containerRuntime or "podman";
   mk = import ./lib/controls.nix pkgs;
 
   fontControls = mk {
@@ -211,6 +212,9 @@ in
     nerd-fonts.symbols-only
   ];
 
+  # spotifast walks $XDG_DATA_DIRS/fonts only 4 levels deep; the fontconfig package-root entries are too deep for the CJK files
+  environment.pathsToLink = [ "/share/fonts" ];
+
   console = {
     font = "ter-v32n";
     packages = with pkgs; [ terminus_font ];
@@ -229,20 +233,27 @@ in
   # Add the HP driver with the proprietary plugin
   services.printing.drivers = [ pkgs.hplipWithPlugin ];
   
-  # Podman replaces Docker: no dockerd/containerd; `docker` and `docker compose` keep working
+  # Container runtime is picked by containerRuntime in env.nix: "podman" (default) or "docker".
+  # Only one of them can own the `docker` command, so switching needs a rebuild.
   # bare image names (`docker run alpine`) resolve on Docker Hub, like real Docker
   virtualisation.containers.registries.search = [ "docker.io" ];
-  virtualisation.podman = {
+
+  # Podman replaces Docker: no dockerd/containerd; `docker` and `docker compose` keep working
+  virtualisation.podman = lib.mkIf (containerRuntime == "podman") {
     enable = true;
     dockerCompat = true;     # `docker` command is podman
     dockerSocket.enable = true; # docker API socket for docker-compose and tools
     defaultNetwork.settings.dns_enabled = true; # compose services resolve each other by name
   };
-  
+
+  # Real Docker: root daemon, so kind can bind ports 80/443 like the testers' setup
+  virtualisation.docker.enable = containerRuntime == "docker";
+
   environment.systemPackages = with pkgs; [
     docker-compose # `docker compose` / `podman compose` provider, talks to the podman socket
-    vim wget curl git pciutils usbutils vis fzf fd ripgrep xclip devenv tree
-    bibata-cursors jq python3 python313Packages.pip
+    vi vim nvim
+    wget curl git pciutils usbutils vis fzf fd ripgrep xclip devenv tree
+    bibata-cursors jq python3 python313Packages.pip binutils
 
     # (`power` used to be a plain script here; it is now powerControls below)
     fontControls

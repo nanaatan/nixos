@@ -147,8 +147,9 @@
         ([?\s- ] . (lambda (cmd)
                      (interactive (list (read-shell-command "$ ")))
                      (start-process-shell-command cmd nil cmd)))
-        ([?\s-t] . vterm)
-        ([s-return] . ,(my/run "st -e /bin/sh -c '. ~/.profile && /bin/sh'"))
+        ;; ([?\s-t] . vterm)
+	([s-return] . (lambda () (interactive) (vterm t)))
+        ;; ([s-return] . ,(my/run "st -e /bin/sh -c '. ~/.profile && /bin/sh'"))
         ([?\s-e] . ,(my/run "pcmanfm"))
         ([?\s-&] . ,(my/run "dmenu_run -l 5 -fn 'JetBrains Mono:style=Medium:size=20' -p ' Run > ' -nb '#0a1719' -nf '#c1c5c5' -sb '#154C4E' -sf '#c1c5c5'"))
         ([?\s-z] . ,(my/run "boomer"))
@@ -166,6 +167,9 @@
 ;; (setopt exwm-input-simulation-keys '(([?\C-x] . [?\C-x])))
 ;; (setopt exwm-input-simulation-keys '(([?\C-u] . [?\C-u])))
 (setq exwm-input-simulation-keys nil)
+;; Ctrl keys go to the application: no Ctrl prefix keys, no Ctrl bindings in exwm-mode-map. Alt is untouched.
+(setopt exwm-input-prefix-keys (mapcar #'vector (seq-remove (lambda (k) (< k 32)) (default-value 'exwm-input-prefix-keys))))
+(map-keymap (lambda (e _) (when (and (integerp e) (< e 27)) (define-key exwm-mode-map (vector e) nil))) exwm-mode-map)
 
 ;; s-B (super+shift+b): rebuild NixOS and show the output in the *compilation* buffer. It is a comint
 ;; buffer, so the sudo password can be typed straight into it. Asks which flake config
